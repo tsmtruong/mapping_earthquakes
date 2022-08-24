@@ -19,13 +19,13 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 // create a base layer that holds both maps
 let baseMaps = {
     "Street": streets,
-    "Satellite Street": satelliteStreets
+    "Satellite": satelliteStreets
 };
 
 // create the map object with center, zoom level and default layer
 let map = L.map('mapid', {
-    center: [43.7, -79.3],
-    zoom: 11,
+    center: [39.5, -98.5],
+    zoom: 3,
     layers: [streets]
 });
 
@@ -35,19 +35,42 @@ L.control.layers(baseMaps).addTo(map);
 // then we add our 'graymap' tile laer to the map.
 streets.addTo(map);
 
-// accessing the toronto airline routes GeoJSON URL
-let torontoHoods = "https://raw.githubusercontent.com/tsmtruong/mapping_earthquakes/main/torontoNeighborhoods.json";
+// accessing the earthquake data GeoJSON URL
+let earthquakes = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-// create a style for the line
-let myStyle = {
-    color: "#ffffa1",
-    weight: 2
-}
 
 //grabbing our geoJSON data
-d3.json(torontoHoods).then(function(data) {
+d3.json(earthquakes).then(function(data) {
     console.log(data);
+    // this function returns the style data for each of the earthquakes we plot on the map
+    // pass the magnitude of the earthquake into the function to calculate the radius
+    function styleInfo(feature) {
+        return {
+            opacity: 1,
+            fillOpacity: 1,
+            fillColor: "#ffae42",
+            color: "#000000",
+            radius: getRadius(feature.properties.mag),
+            stroke: true,
+            weight: 0.5
+        };
+    }
+    // this function determines the radius of the earthquake marker based on its magnitude
+    //earthquakes with a magnitude of 0 will be plotted with a radius of 1
+    function getRadius(magnitude) {
+        if (magnitude === 0) {
+            return 1;
+        }
+        return magnitude * 4;
+    }
     // creating a GeoJSON layer with the retrieved data
-    L.geoJSON(data).addTo(map);
+    L.geoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+            console.log(data)
+            return L.circleMarker(latlng);
+        },
+        // we set the style for each circleMarker using our styleInfo function
+    style: styleInfo
+    }).addTo(map);
 });
 

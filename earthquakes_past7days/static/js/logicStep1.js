@@ -19,13 +19,13 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 // create a base layer that holds both maps
 let baseMaps = {
     "Street": streets,
-    "Satellite Street": satelliteStreets
+    "Satellite": satelliteStreets
 };
 
 // create the map object with center, zoom level and default layer
 let map = L.map('mapid', {
-    center: [43.7, -79.3],
-    zoom: 11,
+    center: [39.5, -98.5],
+    zoom: 3,
     layers: [streets]
 });
 
@@ -35,8 +35,8 @@ L.control.layers(baseMaps).addTo(map);
 // then we add our 'graymap' tile laer to the map.
 streets.addTo(map);
 
-// accessing the toronto airline routes GeoJSON URL
-let torontoHoods = "https://raw.githubusercontent.com/tsmtruong/mapping_earthquakes/main/torontoNeighborhoods.json";
+// accessing the earthquake data GeoJSON URL
+let earthquakes = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 // create a style for the line
 let myStyle = {
@@ -45,7 +45,7 @@ let myStyle = {
 }
 
 //grabbing our geoJSON data
-d3.json(torontoHoods).then(function(data) {
+d3.json(earthquakes).then(function(data) {
     console.log(data);
     // creating a GeoJSON layer with the retrieved data
     L.geoJSON(data).addTo(map);
